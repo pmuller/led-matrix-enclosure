@@ -1,0 +1,35 @@
+[project]
+name = "led-matrix-enclosure"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["build123d>=0.8.0"]
+authors = [
+    { name = "Philippe Muller", email = "pmuller@users.noreply.github.com" },
+]
+
+[tool.uv]
+dev-dependencies = [
+    "basedpyright>=1.22.0",
+    "ocp-tessellate==3.0.8",
+    "ocp-vscode>=2.6.1",
+    "pip>=24.3.1",
+    "pytest>=8.3.4",
+    "ruff>=0.8.1",
+]
+
+[tool.uv.sources]
+
+[project.scripts]
+led-matrix-enclosure-lid = "led_matrix_enclosure.cli.lid:main"
+led-matrix-enclosure-chassis = "led_matrix_enclosure.cli.chassis:main"
+led-matrix-enclosure = "led_matrix_enclosure.cli.enclosure:main"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/led_matrix_enclosure"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
