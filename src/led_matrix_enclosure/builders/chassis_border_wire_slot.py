@@ -1,12 +1,16 @@
 from dataclasses import dataclass
+import logging
 
-from build123d import Compound, Box, Location, Vector
+from build123d import Align, Compound, Box, Location, Vector
 
 from led_matrix_enclosure.dimensions import Object2D
 
 
+LOGGER = logging.getLogger(__name__)
+
+
 @dataclass
-class ChassisBorderWireSlots:
+class ChassisBorderWireSlotsBuilder:
     """Chassis border wire slots."""
 
     #: Thickness of the border
@@ -26,21 +30,18 @@ class ChassisBorderWireSlots:
     height: float = 9.5
 
     def build(self) -> list[Compound]:
+        LOGGER.info("Building chassis border wire slots")
+
         slots: list[Compound] = []
 
         for slot_data in self.slots:
             border_offset = self.border_thickness if self.has_left_border else 0
-            position_x = (
-                slot_data.position.x
-                - (self.border_length - border_offset) / 2
-                + border_offset
-                + slot_data.dimensions.length / 2
-            )
-
+            position_x = slot_data.position.x - self.border_length / 2 + border_offset
             slot = Box(
                 slot_data.dimensions.length,
                 self.border_thickness + self.ledge_size,
                 self.height,
+                align=(Align.MIN, Align.CENTER, Align.CENTER),
             )
 
             location = Location(

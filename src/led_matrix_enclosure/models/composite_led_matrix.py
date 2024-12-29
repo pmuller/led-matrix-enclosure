@@ -29,11 +29,15 @@ But the following layout is not supported:
 from argparse import ArgumentParser, _ArgumentGroup, Namespace  # pyright: ignore[reportPrivateUsage]
 from collections.abc import Generator
 from dataclasses import dataclass
+import logging
 from typing import Self
 
 from led_matrix_enclosure.dimensions import Dimension2D, Object2D
 from led_matrix_enclosure.models.led_matrix import LedMatrix
 from led_matrix_enclosure.profiles.led_matrix import LED_MATRIX_PROFILES
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 LedMatrixLayoutRow = tuple[LedMatrix, ...]

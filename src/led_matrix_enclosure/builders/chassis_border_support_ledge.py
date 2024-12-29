@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 import logging
-from pprint import pformat
 from typing import Literal, cast
 
 from build123d import (
@@ -27,7 +26,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
-class ChassisBorderSupportLedge:
+class ChassisBorderSupportLedgeBuilder:
     """Chassis border support ledge."""
 
     #: Size of the ledge, in mm (sides next to the right angle)
@@ -48,17 +47,14 @@ class ChassisBorderSupportLedge:
     ledge_border_ratio: float = 0.5
 
     def _create_base_triangle(self, plane: Plane, rotation: float) -> Triangle:
-        return cast(
-            Triangle,
-            plane
-            * Triangle(
-                a=self.size * (1 + self.ledge_border_ratio),
-                b=self.size,
-                C=90,
-                align=(Align.MAX, Align.MIN),
-                rotation=rotation,
-            ),
+        triangle = Triangle(
+            a=self.size * (1 + self.ledge_border_ratio),
+            b=self.size,
+            C=90,
+            align=(Align.MAX, Align.MIN),
+            rotation=rotation,
         )
+        return cast(Triangle, plane * triangle)
 
     def _create_cut_shape(
         self,
@@ -66,16 +62,13 @@ class ChassisBorderSupportLedge:
         size: float,
         rotation: float,
     ) -> Rectangle:
-        rectangle = cast(
-            Rectangle,
-            plane
-            * Rectangle(
-                size,
-                size,
-                align=(Align.MAX, Align.MIN),
-                rotation=rotation,
-            ),
+        rectangle = Rectangle(
+            size,
+            size,
+            align=(Align.MAX, Align.MIN),
+            rotation=rotation,
         )
+        rectangle = cast(Rectangle, plane * rectangle)
         # Move the cut shape to the right of the triangle
         direction = 1 if self.side.is_start else -1
         offset = 0 if self.side.is_horizontal else (size * 2)
@@ -88,30 +81,31 @@ class ChassisBorderSupportLedge:
         return rectangle
 
     def _compute_move_x_offset(self, direction: Direction) -> float:
-        return direction * self.border_thickness / 2 + (
+        base_offset = self.border_thickness / 2
+        end_offset = 0 if self.side.is_start else self.length
+        vertical_offset = (
             0
             if self.side.is_horizontal
-            else (
-                (-self.length / 2 - self.border_thickness / 2)
-                + (0 if self.side.is_start else self.length)
-            )
+            else -(self.length / 2 + base_offset) + end_offset
         )
+        return direction * base_offset + vertical_offset
 
     def _compute_move_y_offset(self, direction: Direction) -> float:
-        adjacent_sides_count = len(self.border_presence.get_adjacents(self.side))
         is_horizontal = self.side.is_horizontal
-        return direction * (
-            (self.inner_dimensions.width if is_horizontal else 0)
-            + adjacent_sides_count * self.border_thickness
-        ) / 2 + (
+        side_offset = (
+            len(self.border_presence.get_adjacents(self.side)) * self.border_thickness
+        )
+        vertical_offset = (
             0
             if is_horizontal
             else (
-                (self.border_thickness - adjacent_sides_count * self.border_thickness)
-                / 2
+                (self.border_thickness - side_offset) / 2
                 - (0 if self.side.is_start else self.border_thickness)
             )
         )
+        horizontal_offset = self.inner_dimensions.width if is_horizontal else 0
+        base_offset = (horizontal_offset + side_offset) / 2
+        return direction * base_offset + vertical_offset
 
     def _compute_move_location(self, direction: Direction) -> Location:
         return Location(
@@ -124,7 +118,6 @@ class ChassisBorderSupportLedge:
 
     def build(self) -> Compound:
         LOGGER.debug("Building chassis border support ledge: %s", self.side)
-        LOGGER.debug("%s", pformat(self))
 
         is_start = self.side.is_start
         is_horizontal = self.side.is_horizontal

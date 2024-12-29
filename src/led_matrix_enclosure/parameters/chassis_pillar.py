@@ -1,19 +1,12 @@
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
-import logging
-from pprint import pformat
 from typing import Self
 
-from build123d import Color, Part, Cylinder, Cone, Pos
 
-from led_matrix_enclosure.dimensions import Dimension3D
+@dataclass(frozen=True)
+class ChassisPillarParameters:
+    """Parameters for a single chassis pillar."""
 
-
-LOGGER = logging.getLogger(__name__)
-
-
-@dataclass
-class Pillar:
     #: Pillar diameter, in mm
     diameter: float
     #: Pillar height, in mm
@@ -28,8 +21,8 @@ class Pillar:
     @classmethod
     def add_cli_arguments(cls, parser: ArgumentParser) -> None:
         group = parser.add_argument_group(
-            title="Pillar",
-            description="Parameters for the pillars that support the LED matrices",
+            title="Chassis pillars",
+            description="Parameters for the pillars that support the LED panels PCBs",
         )
         _ = group.add_argument(
             "--pillar-diameter",
@@ -76,21 +69,3 @@ class Pillar:
             base_diameter=arguments.pillar_base_diameter,  # pyright: ignore[reportAny]
             spacing=arguments.pillar_spacing,  # pyright: ignore[reportAny]
         )
-
-    def compute_outer_dimensions(self) -> Dimension3D:
-        return Dimension3D(self.diameter, self.diameter, self.height)
-
-    def build(self) -> Part:
-        LOGGER.info("Building pillar")
-        LOGGER.debug("%s", pformat(self))
-
-        base_position = Pos(Z=-self.height / 2 + self.base_height / 2)
-        base = Cone(self.base_diameter / 2, self.diameter / 2, self.base_height)
-
-        main = Cylinder(self.diameter / 2, self.height)
-
-        pillar = main + base.move(base_position)
-        pillar.color = Color("black")
-        pillar.label = "pillar"
-
-        return pillar

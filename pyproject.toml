@@ -20,9 +20,7 @@ dev-dependencies = [
 [tool.uv.sources]
 
 [project.scripts]
-led-matrix-enclosure-lid = "led_matrix_enclosure.cli.lid:main"
-led-matrix-enclosure-chassis = "led_matrix_enclosure.cli.chassis:main"
-led-matrix-enclosure = "led_matrix_enclosure.cli.enclosure:main"
+led-matrix-enclosure = "led_matrix_enclosure.cli:main"
 
 [tool.hatch.metadata]
 allow-direct-references = true

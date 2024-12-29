@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 import logging
-from pprint import pformat
 
-from build123d import Compound, Location, Part, RotationLike, Vector, Pos
+from build123d import Compound, Location, Part, RotationLike, Vector
 
-from led_matrix_enclosure.parts.connector import Connector
-from led_matrix_enclosure.sides import Side, SideDict
+from led_matrix_enclosure.builders.chassis_module_connector import (
+    ChassisModuleConnectorBuilder,
+)
+from led_matrix_enclosure.parameters.chassis import ChassisParameters
+from led_matrix_enclosure.sides import Side
 from led_matrix_enclosure.dimensions import Dimension3D
 
 LOGGER = logging.getLogger(__name__)
@@ -43,29 +45,19 @@ def _get_rotation(build_side: Side, opening_side: Side) -> RotationLike:
         )
 
 
-@dataclass
-class ChassisConnectors:
-    """Chassis connectors builder."""
+@dataclass(frozen=True)
+class ChassisModuleConnectorsBuilder:
+    """Builds all the module connectors for a chassis module."""
 
-    connector: Connector
-    #: Chassis borders
-    border_presence: SideDict
-    #: Chassis border positions
-    border_positions: dict[Side, Pos]
-    #: Chassis dimensions
-    chassis_dimensions: Dimension3D
-    #: Chassis bottom thickness
-    chassis_bottom_thickness: float
-    #: Chassis border thickness
-    chassis_border_thickness: float
+    #: Module connector parameters
+    parameters: ChassisParameters
 
     def _compute_connector_position(
         self,
+        connector_dimensions: Dimension3D,
         build_side: Side,
         opening_side: Side,
     ) -> Vector:
-        connector_dimensions = self.connector.compute_outer_dimensions()
-
         # Determine main axis based on opening side
         is_horizontal = opening_side.is_horizontal
         is_building_on_opening_side = build_side == opening_side
@@ -74,19 +66,17 @@ class ChassisConnectors:
 
         # Calculate main axis position
         main_size = (
-            self.chassis_dimensions.length
+            self.parameters.outer_dimensions.length
             if is_horizontal
-            else self.chassis_dimensions.width
+            else self.parameters.outer_dimensions.width
         )
         main_direction = -1 if opening_side.is_start else 1
-        main_offset = main_size / 2 - connector_dimensions.height / (
-            4 if self.border_presence.has_opposite(opening_side) else 2
-        )
+        main_offset = (main_size - connector_dimensions.height) / 2
         main_base: float = (
             0
             if is_building_on_opening_side
             else getattr(
-                self.border_positions[build_side].position,
+                self.parameters.module.border_positions[build_side].position,
                 main_axis,
             )
         )
@@ -97,27 +87,32 @@ class ChassisConnectors:
         cross_offset = (
             0
             if is_building_on_opening_side
-            else (self.chassis_border_thickness + connector_dimensions.width) / 2
+            else (self.parameters.borders.thickness + connector_dimensions.width) / 2
         )
         cross_base: float = getattr(
-            self.border_positions[build_side].position,
+            self.parameters.module.border_positions[build_side].position,
             cross_axis,
         )
         cross_value = cross_base + cross_direction * cross_offset
 
         # Calculate Z position
-        z_value = (connector_dimensions.length + self.chassis_bottom_thickness) / 2
+        z_value = (connector_dimensions.length + self.parameters.bottom.thickness) / 2
 
         return Vector(**{main_axis: main_value, cross_axis: cross_value, "Z": z_value})
 
     def _prepare_connector(
         self,
+        connector_dimensions: Dimension3D,
         template: Part,
         build_side: Side,
         opening_side: Side,
     ) -> Part:
         location = Location(
-            self._compute_connector_position(build_side, opening_side),
+            self._compute_connector_position(
+                connector_dimensions,
+                build_side,
+                opening_side,
+            ),
             _get_rotation(build_side, opening_side),
         )
         LOGGER.debug(
@@ -132,24 +127,29 @@ class ChassisConnectors:
 
     def build(self) -> Compound | None:
         LOGGER.info("Building chassis connectors")
-        LOGGER.debug("%s", pformat(self))
 
         connectors: list[Part] = []
-        template = self.connector.build()
+        connector_builder = ChassisModuleConnectorBuilder(self.parameters)
+        connector_dimensions = connector_builder.compute_outer_dimensions()
+        template = connector_builder.build()
 
-        for border, has_border in self.border_presence.items():
+        for border, has_border in self.parameters.module.border_presence.items():
             if not has_border:
                 connectors.append(
                     self._prepare_connector(
+                        connector_dimensions=connector_dimensions,
                         template=template,
                         build_side=border,
                         opening_side=border,
                     )
                 )
 
-                for adjacent_border in self.border_presence.get_adjacents(border):
+                for (
+                    adjacent_border
+                ) in self.parameters.module.border_presence.get_adjacents(border):
                     connectors.append(
                         self._prepare_connector(
+                            connector_dimensions=connector_dimensions,
                             template=template,
                             build_side=adjacent_border,
                             opening_side=border,
