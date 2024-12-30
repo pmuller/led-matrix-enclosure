@@ -3,6 +3,13 @@
 A Python tool to generate 3D printable enclosures for LED matrix panels.
 Built with [build123d](https://github.com/gumyr/build123d).
 
+## Disclaimer
+
+This project is a work in progress.
+While it satisfies my own requirements,
+it might not be suitable for your specific needs.
+Feel free to fork and modify it to your needs.
+
 ## Features
 
 - Supports multiple [LED matrix panel](https://www.aliexpress.com/item/4001296811800.html)
