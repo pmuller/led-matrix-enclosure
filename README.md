@@ -65,7 +65,7 @@ Run with `--help` to see all available options.
 
 ## Output
 
-The tool generates:
+The tool generates assets in the `build/` directory:
 
 - STL files for the chassis components
 - STEP files for the lid components (grid + diffuser)
