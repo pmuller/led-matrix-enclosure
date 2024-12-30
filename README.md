@@ -72,6 +72,26 @@ The tool generates assets in the `build/` directory:
 
 The output files can be directly used with a 3D printer slicer.
 
+## Splitting the enclosure as separate parts
+
+In case you want to print an enclosure that is bigger than your printer bed,
+you can split the enclosure into multiple parts using the `--enclosure-layout` option.
+
+For example, to split the enclosure into 2 horizontal parts, you can run:
+
+```bash
+led-matrix-enclosure 16x16,16x16 32x8 --enclosure-layout 2x1
+```
+
+This will generate 2 STL files in the `build/` directory:
+
+- `module:x=0,y=0.chassis.stl`
+- `module:x=0,y=0.lid.step`
+- `module:x=160,y=0.chassis.stl`
+- `module:x=160,y=0.lid.step`
+
+You can then print each part separately and assemble them together using M3 screws and nuts.
+
 ## Development
 
 1. Follow the [Installation](#installation) section to set up the development environment.
