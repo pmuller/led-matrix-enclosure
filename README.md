@@ -65,16 +65,6 @@ The tool generates:
 
 The output files can be directly used with a 3D printer slicer.
 
-## Project Structure
-
-- `src/led_matrix_enclosure/`
-  - `builders/`: Components that build the 3D models
-  - `models/`: Core data models for LED matrices
-  - `parameters/`: Parameter definitions and CLI argument handling
-  - `dimensions.py`: Dimension and position utilities
-  - `sides.py`: Side/border management
-  - `cli.py`: Command-line interface
-
 ## Development
 
 1. Follow the [Installation](#installation) section to set up the development environment.
