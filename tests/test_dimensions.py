@@ -1,6 +1,11 @@
 import pytest
 
-from led_matrix_enclosure.dimensions import Dimension2D, Dimension3D, Object2D, Position2D
+from led_matrix_enclosure.dimensions import (
+    Dimension2D,
+    Dimension3D,
+    Object2D,
+    Position2D,
+)
 
 
 @pytest.mark.parametrize(
