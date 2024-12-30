@@ -5,7 +5,8 @@ Built with [build123d](https://github.com/gumyr/build123d).
 
 ## Features
 
-- Supports multiple LED matrix panel sizes (8x8, 16x16, 32x8)
+- Supports multiple [LED matrix panel](https://www.aliexpress.com/item/4001296811800.html)
+  sizes (8x8, 16x16, 32x8)
 - Modular design allowing multiple panels to be connected together
 - Customizable grid and diffuser for even light distribution
 - Wire management slots for clean cable routing

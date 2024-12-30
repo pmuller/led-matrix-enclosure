@@ -1,3 +1,11 @@
+"""
+This module contains the LED matrix profiles.
+
+So far we support panels sold on AliExpress,
+like this one: https://www.aliexpress.com/item/4001296811800.html
+
+"""
+
 from led_matrix_enclosure.dimensions import Dimension2D, Object2D, Position2D
 from led_matrix_enclosure.models.led_matrix import LedMatrix
 
