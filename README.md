@@ -13,9 +13,15 @@ Built with [build123d](https://github.com/gumyr/build123d).
 - Robust mounting system with support pillars and borders
 - Configurable parameters for fine-tuning the design
 
-## Installation
+## Requirements
 
-Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/)
+- VSCode and the
+  [OCP CAD Viewer](https://github.com/bernhard-42/vscode-ocp-cad-viewer/tree/main)
+  extension
+
+## Installation
 
 ```bash
 # 1. Clone the repository
