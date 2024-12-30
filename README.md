@@ -19,9 +19,11 @@ Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
 ```bash
 # 1. Clone the repository
 git clone https://github.com/pmuller/led-matrix-enclosure.git
-# 2. Install the dependencies
-uv sync
-# 3. Source the virtual environment
+# 2. First cd into the cloned directory
+cd led-matrix-enclosure
+# 3. Then sync dependencies
+uv pip sync
+# 4. Source the virtual environment
 . .venv/bin/activate
 ```
 
