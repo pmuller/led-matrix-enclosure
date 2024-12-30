@@ -1,0 +1,17 @@
+name: Build
+
+on: push
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+      - run: uv run ruff format --check
+      - run: uv run ruff check
+      - run: uv run basedpyright
+      - run: uv run pytest -vvv
