@@ -83,7 +83,7 @@ For example, to split the enclosure into 2 horizontal parts, you can run:
 led-matrix-enclosure 16x16,16x16 32x8 --enclosure-layout 2x1
 ```
 
-This will generate 2 STL files in the `build/` directory:
+This will generate 1 STL and 1 STEP file for each module in the `build/` directory:
 
 - `module:x=0,y=0.chassis.stl`
 - `module:x=0,y=0.lid.step`
